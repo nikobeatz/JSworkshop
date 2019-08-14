@@ -40,7 +40,7 @@ closeBtn.addEventListener('click', () =>{
 const cards = document.querySelectorAll('.goods .card');
 const cartWrapper = document.querySelector('.cart-wrapper');
 const cartEmpty = document.getElementById('cart-empty');
-const countGoods = document.querySelector('.counter')
+const countGoods = document.querySelector('.counter');
 
 cards.forEach((card) => {
     const btn = card.querySelector('button');
@@ -49,13 +49,15 @@ cards.forEach((card) => {
         cartWrapper.appendChild(cardClone);
         cartEmpty.remove();
         showData();
-    })
-})
+    });
+});
 
 function showData() {
     const cardsCart = cartWrapper.querySelectorAll('.card');
     countGoods.textContent = cardsCart.length;
 }
+
+
 
 
 
