@@ -109,13 +109,14 @@ function actionPage() {
 
 
     discountCheckbox.addEventListener('click', () => {
-        cards.forEach((card) => {
-            if (discountCheckbox.checked){
-                if (!card.querySelector('.card-sale')){
-                    card.parentNode.style.display = 'none';
+        cards.forEach((elem) => {
+            const cardPrice = elem.querySelector('.card-price');
+            const price = parseFloat(cardPrice.textContent);
+            if (((discountCheckbox.checked) && (!elem.querySelector('.card-sale'))) || ((min.value && price < min.value) || (max.value && price > max.value))) {
+                    elem.parentNode.style.display = 'none';
                 }
-            } else {
-                card.parentNode.style.display = '';
+             else {
+                elem.parentNode.style.display = '';
             }
         });
     });
@@ -148,6 +149,18 @@ function actionPage() {
             }
         });
 
+    });
+
+    search.addEventListener('keydown', (event) => {
+        const searchText = new RegExp(search.value.trim(), 'i');
+        cards.forEach((card) => {
+            const title = card.querySelector('.card-title');
+            if (!searchText.test(title.textContent)) {
+                card.parentNode.style.display = 'none';
+            } else {
+                card.parentNode.style.display = '';
+            }
+        });
     });
 
     
