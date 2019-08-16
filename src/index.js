@@ -122,14 +122,14 @@ function actionPage() {
     });
 
     function filterPrice(){
-        cards.forEach((card) => {
-            const cardPrice = card.querySelector('.card-price');
+        cards.forEach((elem) => {
+            const cardPrice = elem.querySelector('.card-price');
             const price = parseFloat(cardPrice.textContent);
 
             if ((min.value && price < min.value) || (max.value && price > max.value)){
-                card.parentNode.style.display = 'none';
+                elem.parentNode.style.display = 'none';
             } else {
-                card.parentNode.style.display = '';
+                elem.parentNode.style.display = '';
             }
 
         });
@@ -151,7 +151,7 @@ function actionPage() {
 
     });
 
-    search.addEventListener('keydown', (event) => {
+    search.addEventListener('keydown', () => {
         const searchText = new RegExp(search.value.trim(), 'i');
         cards.forEach((card) => {
             const title = card.querySelector('.card-title');
@@ -170,4 +170,99 @@ actionPage();
 
 
 //end filter sale
+
+
+
+//GetData from server
+function getData() {
+    const goodsWrapper = document.querySelector('.goods');
+    return fetch('../db/db.json')
+    .then((response) => {
+        if (response.ok){
+            return response.json();
+        } else {
+            throw new Error ('error: ' + response.status);
+        }
+    })
+    .then((data) => {
+        return data;
+    })
+    .catch((err) => {
+        console.warn(err);
+        goodsWrapper.innerHTML = '<div>Oops! something goes wrong</div>';
+    });
+}
+//show cards
+function renderCards(data){
+    const goodsWrapper = document.querySelector('.goods');
+    data.goods.forEach((good) => {
+        const card = document.createElement('div');
+        card.className = 'col-12 col-md-6 col-lg-4 col-xl-3';
+        card.innerHTML = `
+                                <div class="card" data-category="${good.category}">
+                                
+									${good.sale ? '<div class="card-sale">🔥Hot Sale🔥</div>' : ''}
+									<div class="card-img-wrapper">
+										<span class="card-img-top"
+											style="background-image: url('${good.img}')"></span>
+									</div>
+									<div class="card-body justify-content-between">
+										<div class="card-price" style=""${good.sale ? 'color:red' : ''}">${good.price} Р</div>
+										<h5 class="card-title">${good.title}</h5>
+										<button class="btn btn-primary">В корзину</button>
+									</div>
+								</div>
+        `;
+       goodsWrapper.appendChild(card); 
+    });
+
+}
+
+function renderCatalog(){
+    const cards = document.querySelectorAll('.goods .card');
+    const catalogList = document.querySelector('.catalog-list');
+    const catalogWrapper = document.querySelector('.catalog');
+    const catalogBtn = document.querySelector('.catalog-button');
+    const goods = document.querySelector('.goods');
+    const categories = new Set();
+
+    cards.forEach((card) => {
+        categories.add(card.dataset.category);
+    });
+
+    categories.forEach((item) => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        catalogList.appendChild(li);
+    });
+
+    catalogBtn.addEventListener('click', (event) => {
+        if (catalogWrapper.style.display) {
+            catalogWrapper.style.display = '';
+        } else {
+            catalogWrapper.style.display = 'block';
+        }
+
+        if (event.target.tagName === 'LI') {
+            cards.forEach((card) => {
+                if (card.dataset.category === event.target.textContent) {
+                    goods.appendChild(card.parentNode);
+                } else {
+                    card.parentNode.remove();
+                }
+            });
+        }
+    });
+
+}
+
+getData().then((data) =>{
+    renderCards(data);
+    toggleCheckbox();
+    toggleCart();
+    addCart();
+    actionPage();
+    renderCatalog();
+});
+//End GetData from server
 
